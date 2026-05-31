@@ -19,7 +19,8 @@ function w_ () {
   # —— Read Input & Create Dynamic Vars ————————————————————————————————————— #
 
   # `-h` means exclude headers
-  local -ra input_lines=( "${(@f)$( command w -h )}" )
+  local -a lines=( "${(@f)$( command w -h )}" )
+  local -i 10 line_count=$#lines
 
   local -a    "${(@)^sections}_arr"
   local -i 10 "${(@)^sections}_len"=-1
@@ -29,10 +30,12 @@ function w_ () {
   local -i 10 section_len
   local line content section
 
+  # for width calculation purposes, pass in each one of the titles, as well
+  #  as a delimiter line before we pass the actual lines
   for line in  \
     "$^titles " \
     "${(pr: $#titles * $#row_delim ::$row_delim:)}" \
-    "${(@)input_lines}"
+    "${(@)lines}"
   {
     for content section in "${(@)${(s: :)line}:^sections}"; {
       eval "${section}_arr+=( '$content' )"
@@ -53,35 +56,44 @@ function w_ () {
   # —— Pad Array Elems & Add Separator —————————————————————————————————————— #
 
   for section in "${(@)sections}"; {
+    # pad each element to the row's max len, then concatenate each with a `│`
     eval "${section}_arr=(
       \"\${(@r: ${section}_len + 1 :)^${section}_arr}$column_sep\"
     )"
   }
 
-  typeset -p "${(@)^sections}_arr" #r)DEBUG
-  line
+  typeset -p "${(@)^sections}_arr"; line #r)DEBUG
 
   # —— Do Final Formatting & Print —————————————————————————————————————————— #
 
-  setopt extended_glob
+  setopt extended_glob  # needed to identify the dividing line sections
 
   local -i 10 line_no sect_no
+  lines=()  # empty the original `$lines` array so we can reuse it
 
-  for line_no in {1.."$(( $#input_lines + 2 ))"}; {
+  # +1 for the header line; +1 for the separator line
+  for line_no in {1.."$(( line_count + 2 ))"}; {
     for sect_no in {1.."${#sections}"}; {
 
+      # `sections[sect_no]` : get the section name
+      # `/%/_arr[line_no]`  : append the str "_arr[line_no]" to the sect name
+      # `${(P)...}`         : dereference all of that to get the sect's content
+      # and NB ↓ the space added before each section
       section=" ${(P)${sections[sect_no]/%/_arr[line_no]}}"
 
+      # replace the dividing line's sections with horizontal box drawing chars
       if [[ "$section" == " $row_delim"(' '#)$column_sep ]] {
-        section="${section/$column_sep/$title_sep}"
-        section="${section//[^$title_sep]/$row_sep}"
+        section="${section/$column_sep/$title_sep}"   #  │  ->  ┼
+        section="${section//[^$title_sep]/$row_sep}"  # ^┼  ->  ─
       }
 
+      # if it's the last section, remove the trailing table border,
+      #  leaving an unbound table
       if (( sect_no == $#sections )) section="${section%?}"
 
-      echo -nE "$section"
+      lines[line_no]+="$section"
     }
-
-    echo
   }
+
+  echo "${(F)lines}"; line #r)DEBUG
 }
