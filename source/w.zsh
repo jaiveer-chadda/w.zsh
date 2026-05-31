@@ -3,24 +3,24 @@
 function w_ () {
   command w; line
 
-  setopt local_options warn_create_global warn_nested_var
+  setopt local_options warn_create_global
 
-  local -r row_min_width=4
-  local -r column_sep=│
-
-  local -r row_delim="${(l: row_min_width - 1 ::0:)RANDOM} "
+  local -ri 10 row_min_width=4
 
   local -ra titles=( 'USER' 'TTY' 'FROM' 'LOGIN@' 'IDLE' 'WHAT' )
   local -ra sections=( "${(@L)titles//@}" )
 
-  local -a    "${(@)^sections}_arr"
-  local -i 10 "${(@)^sections}_len"=-1
+  local -r row_sep=─ column_sep=│ title_sep=┼
+  local -r row_delim="${(l: row_min_width - 1 ::0:)RANDOM} "
 
   # `-h` means exclude headers
   local -ra input_lines=( "${(@f)$( command w -h )}" )
 
-  local line content section
+  local -a    "${(@)^sections}_arr"
+  local -i 10 "${(@)^sections}_len"=-1
+
   local -i 10 section_len
+  local line content section
 
   for line in  \
     "$^titles " \
@@ -50,4 +50,27 @@ function w_ () {
   }
 
   typeset -p "${(@)^sections}_arr"
+  line
+
+  setopt extended_glob
+
+  local -i 10 line_no sect_no
+
+  for line_no in {1.."$(( $#input_lines + 2 ))"}; {
+    for sect_no in {1.."${#sections}"}; {
+
+      section=" ${(P)${sections[sect_no]/%/_arr[line_no]}}"
+
+      if [[ "$section" == " $row_delim"(' '#)$column_sep ]] {
+        section="${section/$column_sep/$title_sep}"
+        section="${section//[^$title_sep]/$row_sep}"
+      }
+
+      if (( sect_no == $#sections )) section="${section%?}"
+
+      echo -nE "$section"
+    }
+
+    echo
+  }
 }
