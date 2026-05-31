@@ -5,6 +5,11 @@ function w_ () {
 
   setopt local_options warn_create_global warn_nested_var
 
+  local -r row_min_width=4
+  local -r column_sep=│
+
+  local -r row_delim="${(l: row_min_width - 1 ::0:)RANDOM} "
+
   local -ra titles=( 'USER' 'TTY' 'FROM' 'LOGIN@' 'IDLE' 'WHAT' )
   local -ra sections=( "${(@L)titles//@}" )
 
@@ -17,7 +22,11 @@ function w_ () {
   local line content section
   local -i 10 section_len
 
-  for line in "${(@)input_lines}"; {
+  for line in  \
+    "$^titles " \
+    "${(pr: $#titles * $#row_delim ::$row_delim:)}" \
+    "${(@)input_lines}"
+  {
     for content section in "${(@)${(s: :)line}:^sections}"; {
       eval "${section}_arr+=( '$content' )"
 
@@ -28,20 +37,17 @@ function w_ () {
       }
 
       # get the length of the section we just created
-      eval "section_len=\${#:-\$${section}_arr[-1]}"
+      local section_len="${(P)#${section/%/_arr[-1]}}"
 
-      if (( section_len > "${section}_len" )) {
-        local "${section}_len"=$section_len
-      }
+      if (( section_len > ${section}_len )) local ${section}_len=$section_len
     }
   }
 
-  # typeset -p "${(@)^sections}_arr" "${(@)^sections}_len"; line
-
   for section in "${(@)sections}"; {
-    eval "${section}_arr=( \"\${(@r:${section}_len + 1:)^${section}_arr}│\" )"
+    eval "${section}_arr=(
+      \"\${(@r: ${section}_len + 1 :)^${section}_arr}$column_sep\"
+    )"
   }
 
   typeset -p "${(@)^sections}_arr"
-
 }
