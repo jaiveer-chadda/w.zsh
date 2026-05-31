@@ -1,7 +1,10 @@
 #!/usr/bin/env zsh
 
 function w_ () {
-  command w; line
+
+  command w; line  #r)DEBUG
+
+  # —— Setup & Constants ———————————————————————————————————————————————————— #
 
   setopt local_options warn_create_global
 
@@ -13,11 +16,15 @@ function w_ () {
   local -r row_sep=─ column_sep=│ title_sep=┼
   local -r row_delim="${(l: row_min_width - 1 ::0:)RANDOM} "
 
+  # —— Read Input & Create Dynamic Vars ————————————————————————————————————— #
+
   # `-h` means exclude headers
   local -ra input_lines=( "${(@f)$( command w -h )}" )
 
   local -a    "${(@)^sections}_arr"
   local -i 10 "${(@)^sections}_len"=-1
+
+  # —— Populate Arrays & Find Max Lens —————————————————————————————————————— #
 
   local -i 10 section_len
   local line content section
@@ -43,14 +50,18 @@ function w_ () {
     }
   }
 
+  # —— Pad Array Elems & Add Separator —————————————————————————————————————— #
+
   for section in "${(@)sections}"; {
     eval "${section}_arr=(
       \"\${(@r: ${section}_len + 1 :)^${section}_arr}$column_sep\"
     )"
   }
 
-  typeset -p "${(@)^sections}_arr"
+  typeset -p "${(@)^sections}_arr" #r)DEBUG
   line
+
+  # —— Do Final Formatting & Print —————————————————————————————————————————— #
 
   setopt extended_glob
 
