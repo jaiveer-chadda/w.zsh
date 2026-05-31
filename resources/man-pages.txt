@@ -1,0 +1,97 @@
+# ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————— #
+
+[ $ w ]
+
+16:38  up 3 days, 22:57, 2 users, load averages: 2.69 3.63 3.35
+USER  TTY      FROM  LOGIN@  IDLE   WHAT
+jv    console  -     Wed17   3days  -
+jv    s000     -     0:26    -      column  -t
+
+# ———————————————————————————————————————————————————————————— #
+
+options:
+‾‾‾‾‾‾‾‾
+ -h  :  Suppress the heading.
+
+ -i  :  Output is sorted by idle time.
+
+ -n  :  Do not attempt to resolve network addresses (normally w interprets addresses and attempts
+        to display them as names).  When -n is specified more than once, hostnames stored in utmp
+        are attempted to resolve to display them as network addresses.
+
+# ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————— #
+
+[ $ finger ]
+
+Login            Name             TTY      Idle  Login  Time   Office  Phone
+jv               Jaiveer Chadda   console    3d  Wed    17:43
+jv               Jaiveer Chadda   s000           Sun    00:26
+jv               Jaiveer Chadda   s001           Sun    16:38
+jv               Jaiveer Chadda  *s002           Sun    02:04
+
+# ———————————————————————————————————————————————————————————— #
+
+options:
+‾‾‾‾‾‾‾‾
+-s  :  Display the user's login name, real name, terminal name and write status (as a ``*'' before
+       the terminal name if write permission is denied), idle time, login time, and either office
+       location and office phone number, or the remote host.  If -o is given, the office location
+       and office phone number is printed (the default).  If -h is given, the remote host is
+       printed instead.
+
+       Idle time is in minutes if it is a single integer, hours and minutes if a ``:'' is present,
+       or days if a ``d'' is present.  If it is an “*”, the login time indicates the time of last
+       login.  Login time is displayed as the day name if less than 6 days, else month, day; hours
+       and minutes, unless more than six months ago, in which case the year is displayed rather
+       than the hours and minutes.
+
+       Unknown devices as well as nonexistent idle and login times are displayed as single
+       asterisks.
+
+-h  :  When used in conjunction with the -s option, the name of the remote host is displayed
+       instead of the office location and office phone.
+
+-o  :  When used in conjunction with the -s option, the office location and office phone
+       information is displayed instead of the name of the remote host.
+
+-g  :  This option restricts the gecos output to only the users' real name.  It also has the side-
+       effect of restricting the output of the remote host when used in conjunction with the -h
+       option.
+
+-k  :  Disable all use of the user accounting database.
+
+# ——————————————————————————————————————————————————————————————————————————————————————————————————————————————————— #
+
+[ $ who ]
+
+jv               console      27 May 17:43 
+jv               ttys000      31 May 00:26 
+jv               ttys001      31 May 16:38
+
+# ———————————————————————————————————————————————————————————— #
+
+options:
+‾‾‾‾‾‾‾‾
+-a  :  Equivalent to -bTu, with the exception that output is not restricted to the time and date
+       of the last system reboot.
+
+-b  :  Write the time and date of the last system reboot.
+
+-H  :  Write column headings above the output.
+
+-m  :  Show information about the terminal attached to standard input only.
+
+-q  :  “Quick mode”: List the names and number of logged in users in columns.  All other command
+       line options are ignored.
+
+-s  :  Show the name, line and time fields only.  This is the default.
+
+-T  :  Indicate whether each user is accepting messages.  One of the following characters is
+       written:
+
+       +  User is accepting messages.
+       -  User is not accepting messages.
+       ?  An error occurred.
+
+-u  :  Show idle time for each user in hours and minutes as hh:mm, ‘.’ if the user has been idle
+       less than a minute, and “old” if the user has been idle more than 24 hours.
